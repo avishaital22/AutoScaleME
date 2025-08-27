@@ -1,0 +1,55 @@
+name: Scan Docker Image CI
+
+on:
+  workflow_run:
+    workflows: ["Build Docker Image CI"]
+    types:
+      - completed
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      # Checkout code (optional for scanning)
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Log in to DockerHub to access the image
+      - name: Log in to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # Scan Docker image using Trivy
+      - name: Scan Docker image
+        id: trivy
+        uses: aquasecurity/trivy-action@0.20.0
+        with:
+          image-ref: ${{ secrets.DOCKERHUB_USERNAME }}/autoscaleme:${{ github.event.workflow_run.head_sha }}
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          format: table
+
+      - name: Warn for Medium/Low vulnerabilities
+        run: |
+          echo "Checking for Medium/Low vulnerabilities..."
+          docker run --rm aquasec/trivy image --severity LOW,MEDIUM --quiet ${{ secrets.DOCKERHUB_USERNAME }}/autoscaleme:${{ github.event.workflow_run.head_sha }}
+          echo "⚠️ Medium/Low vulnerabilities detected (if any). Pipeline continues."
+
+
+      # Delete the image if the scan fails
+      - name: Delete image if scan failed
+        if: ${{ failure() }}
+        run: |
+          echo "❌ Scan failed! Deleting image from DockerHub..."
+          curl -X DELETE \
+            -u ${{ secrets.DOCKERHUB_USERNAME }}:${{ secrets.DOCKERHUB_TOKEN }} \
+            https://hub.docker.com/v2/repositories/${{ secrets.DOCKERHUB_USERNAME }}/autoscaleme/tags/${{ github.event.workflow_run.head_sha }}/
+          exit 1
+
+      # Output success message
+      - name: Scan success
+        if: ${{ success() }}
+        run: echo "✅ Docker image passed security scan!"
