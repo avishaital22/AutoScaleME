@@ -3,9 +3,12 @@ name: CI Image Tests
 on:
   push:
     branches:
+      - main
       - test
+      
   pull_request:
     branches:
+      - main
       - test
 
 jobs:
