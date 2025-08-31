@@ -51,8 +51,10 @@ jobs:
 
       # הרצת Unit Tests עם pytest
       - name: Run tests
-        run: pytest app/tests --maxfail=1 --disable-warnings -q
-
+        run: |
+          cd app
+          python -m pytest tests --maxfail=1 --disable-warnings -q
+          
       - name: All tests passed
         if: ${{ success() }}
         run: echo "🎉 All lint and pytest tests passed successfully!"
