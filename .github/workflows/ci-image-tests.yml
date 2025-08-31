@@ -45,10 +45,16 @@ jobs:
           pip install -r app/requirements.txt
           pip install pytest flake8
 
+      - name: Debug paths
+        run: |
+          pwd
+          ls -R .
+
+
       # הרצת Lint
       - name: Run lint
         run: flake8 app/
-
+  
       # הרצת Unit Tests עם pytest
       - name: Run tests
         run: |
