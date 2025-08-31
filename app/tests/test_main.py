@@ -1,13 +1,13 @@
 import pytest
 import sys
-import os
-import main
 
 # Add the app directory to Python path
 sys.path.insert(0, '/home/runner/work/AutoScaleME/AutoScaleME/app')
 
+import main
 
-@pytest.fixture  
+
+@pytest.fixture
 def client():
     main.app.config['TESTING'] = True
     with main.app.test_client() as client:
