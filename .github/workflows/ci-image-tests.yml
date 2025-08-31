@@ -21,41 +21,34 @@ jobs:
       }}
       
     steps:
-      # בדיקה של הקוד מה-repo
+      # checout the repo
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # התקנת Python
+      # install Python
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      # Cache ל-pip כדי לחסוך זמן
       - name: Cache pip
         uses: actions/cache@v3
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('app/requirements.txt') }}
 
-      # התקנת dependencies
+      # install dependencies
       - name: Install dependencies
         run: |
           pip install --upgrade pip
           pip install -r app/requirements.txt
           pip install pytest flake8
 
-      - name: Debug paths
-        run: |
-          pwd
-          ls -R .
-
-
-      # הרצת Lint
+      # run Lint
       - name: Run lint
         run: flake8 app/
   
-      # הרצת Unit Tests עם pytest
+      # run unitest with pytest
       - name: Run tests
         run: |
           PYTHONPATH=. python -m pytest app/tests --maxfail=1 --disable-warnings -q
