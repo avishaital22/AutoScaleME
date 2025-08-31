@@ -5,7 +5,8 @@ WORKDIR /app
 # Copy requirements with correct ownership
 COPY --chown=appuser:appuser app/requirements.txt .
 
-# Install dependencies as root 
+# Install dependencies as root
+USER root
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code with correct ownership
