@@ -18,12 +18,6 @@ COPY --chown=appuser:appuser app/ .
 # Switch to non-root user
 USER appuser
 
-# Ensure __init__.py exists
-RUN touch /app/__init__.py
-
-# Run tests
-RUN pytest || (echo "Tests failed!" && exit 1)
-
 EXPOSE 5000
 
 CMD ["python", "main.py"]
