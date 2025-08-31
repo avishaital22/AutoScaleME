@@ -6,6 +6,11 @@ import main
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 
+print("Current working directory:", os.getcwd())
+print("Files in current dir:", os.listdir('.'))
+print("Files in app dir:", os.listdir('./app') if os.path.exists('./app') else 'app dir not found')
+print("Python path:", sys.path)
+
 @pytest.fixture
 def client():
     main.app.config['TESTING'] = True
