@@ -52,8 +52,7 @@ jobs:
       # הרצת Unit Tests עם pytest
       - name: Run tests
         run: |
-          cd app
-          PYTHONPATH=/home/runner/work/AutoScaleME/AutoScaleME/app python -m pytest tests --maxfail=1 --disable-warnings -q
+          PYTHONPATH=. python -m pytest app/tests --maxfail=1 --disable-warnings -q
           
       - name: All tests passed
         if: ${{ success() }}
