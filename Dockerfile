@@ -5,11 +5,10 @@ WORKDIR /app
 # Copy requirements with correct ownership
 COPY --chown=appuser:appuser app/requirements.txt .
 
-# Install dependencies temporarily as root (no --user)
-USER root
+# Install dependencies as root 
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
+# Copy application code with correct ownership
 COPY --chown=appuser:appuser app/ .
 
 # Switch back to non-root user
