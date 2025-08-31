@@ -1,7 +1,6 @@
 # app/main.py
 
 from flask import Flask, jsonify
-import time
 import math
 
 app = Flask(__name__)
