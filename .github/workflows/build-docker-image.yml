@@ -27,6 +27,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # Debug: show Dockerfile
+      - name: Show Dockerfile
+        run: cat ./Dockerfile
+
       # Log in to DockerHub
       - name: Log in to DockerHub
         uses: docker/login-action@v3
