@@ -1,5 +1,4 @@
 # app/main.py
-
 from flask import Flask, jsonify
 import math
 
@@ -13,7 +12,6 @@ def home():
 
 @app.route("/load")
 def load():
-    # סימולציה של חישוב כבד
     count = 0
     for number in range(1, 10000):
         if is_prime(number):
