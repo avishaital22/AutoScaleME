@@ -1,0 +1,58 @@
+name: CI Image Tests
+
+on:
+  push:
+    branches:
+      - test
+  pull_request:
+    branches:
+      - test
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+
+    # && operator is working like if-else, if branch is main then env production...
+    environment: ${{ 
+      github.event.workflow_run.head_branch == 'main' && 'production' || 
+      github.event.workflow_run.head_branch == 'release' && 'staging' || 
+      github.event.workflow_run.head_branch == 'test' && 'development' || 
+      'development'
+      }}
+      
+    steps:
+      # בדיקה של הקוד מה-repo
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # התקנת Python
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # Cache ל-pip כדי לחסוך זמן
+      - name: Cache pip
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('app/requirements.txt') }}
+
+      # התקנת dependencies
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r app/requirements.txt
+          pip install pytest flake8
+
+      # הרצת Lint
+      - name: Run lint
+        run: flake8 app/
+
+      # הרצת Unit Tests עם pytest
+      - name: Run tests
+        run: pytest app/tests --maxfail=1 --disable-warnings -q
+
+      - name: All tests passed
+        if: ${{ success() }}
+        run: echo "🎉 All lint and pytest tests passed successfully!"
