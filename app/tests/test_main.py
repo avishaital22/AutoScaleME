@@ -1,6 +1,6 @@
 import pytest
 import sys
-import main
+from app import main
 
 # Add the app directory to Python path
 sys.path.insert(0, '/home/runner/work/AutoScaleME/AutoScaleME/app')
