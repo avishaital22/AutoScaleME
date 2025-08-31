@@ -1,7 +1,9 @@
 import pytest
-import main  # מייבא את main.py מתוך תיקיית app/
 import sys
 import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import main
+
 sys.path.insert(
     0,
     os.path.abspath(
