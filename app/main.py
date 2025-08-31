@@ -5,9 +5,11 @@ import math
 
 app = Flask(__name__)
 
+
 @app.route("/")
 def home():
     return "Hello from AutoScaleMe!"
+
 
 @app.route("/load")
 def load():
@@ -18,6 +20,7 @@ def load():
             count += 1
     return jsonify({"prime_count": count})
 
+
 def is_prime(n):
     if n <= 1:
         return False
@@ -26,6 +29,6 @@ def is_prime(n):
             return False
     return True
 
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
-
