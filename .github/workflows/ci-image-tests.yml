@@ -11,6 +11,15 @@ on:
 jobs:
   lint-and-test:
     runs-on: ubuntu-latest
+
+    # && operator is working like if-else, if branch is main then env production...
+    environment: ${{ 
+      github.event.workflow_run.head_branch == 'main' && 'production' || 
+      github.event.workflow_run.head_branch == 'release' && 'staging' || 
+      github.event.workflow_run.head_branch == 'test' && 'development' || 
+      'development'
+      }}
+      
     steps:
       # בדיקה של הקוד מה-repo
       - name: Checkout code
