@@ -6,7 +6,6 @@ import main
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 
-
 @pytest.fixture
 def client():
     main.app.config['TESTING'] = True
