@@ -53,7 +53,7 @@ jobs:
       - name: Run tests
         run: |
           cd app
-          python -m pytest tests --maxfail=1 --disable-warnings -q
+          PYTHONPATH=/home/runner/work/AutoScaleME/AutoScaleME/app python -m pytest tests --maxfail=1 --disable-warnings -q
           
       - name: All tests passed
         if: ${{ success() }}
