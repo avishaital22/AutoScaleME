@@ -2,10 +2,7 @@ import pytest
 import sys
 import os
 
-# Add parent directory to path
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-
-# Now import main
 from main import app
 
 
