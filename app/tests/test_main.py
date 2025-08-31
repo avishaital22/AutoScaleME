@@ -3,15 +3,6 @@ import sys
 import os
 import main
 
-
-print("Current working directory:", os.getcwd())
-print("Files in current dir:", os.listdir('.'))
-if os.path.exists('./app'):
-    print("Files in app dir:", os.listdir('./app'))
-else:
-    print('app dir not found')
-print("Python path:", sys.path)
-
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 
