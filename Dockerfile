@@ -1,17 +1,22 @@
-# Dockerfile
 FROM python:3.11-slim
 
+WORKDIR /app
+
+# Create a non-root user
 RUN groupadd -r appuser && useradd -r -g appuser appuser
 
-WORKDIR /app
-RUN mkdir -p /app && chown -R appuser:appuser /app
-
-USER appuser
-
+# Copy requirements with correct ownership
 COPY --chown=appuser:appuser app/requirements.txt .
-RUN pip install --no-cache-dir --user -r requirements.txt
 
+# Temporarily switch to root to install dependencies
+USER root
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the rest of the application code with correct ownership
 COPY --chown=appuser:appuser app/ .
+
+# Switch to non-root user
+USER appuser
 
 EXPOSE 5000
 
