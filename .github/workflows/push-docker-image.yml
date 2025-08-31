@@ -10,6 +10,15 @@ jobs:
   push-latest:
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    # && operator is working like if-else, if branch is main then env production...
+    environment: ${{ 
+      github.event.workflow_run.head_branch == 'main' && 'production' || 
+      github.event.workflow_run.head_branch == 'release' && 'staging' || 
+      github.event.workflow_run.head_branch == 'test' && 'development' || 
+      'development'
+      }}
+      
     steps:
       - name: Log in to DockerHub
         uses: docker/login-action@v3
