@@ -1,12 +1,13 @@
 name: CI Image Tests
 
 on:
-  push:
+  create:
     branches:
-      - test
+      - 'feature*'
   pull_request:
     branches:
-      - test
+      - 'test'
+      - 'feature*'
 
 jobs:
   lint-and-test:
