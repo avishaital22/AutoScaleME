@@ -9,8 +9,7 @@ on:
 jobs:
   push-latest:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
-
+    if: ${{ github.event.workflow_run.conclusion == 'success' && env.VERSION_TAG != '' }}
     # Set environment based on branch
     environment: ${{ 
       github.event.workflow_run.head_branch == 'main' && 'production' || 
@@ -37,9 +36,15 @@ jobs:
           docker tag ${{ secrets.DOCKERHUB_USERNAME }}/autoscaleme:${{ github.event.workflow_run.head_sha }} \
                      ${{ secrets.DOCKERHUB_USERNAME }}/autoscaleme:latest
 
+      - name: Tag Docker image with version
+        run: |
+          docker tag myimage:${{ github.sha }} myimage:${{ env.VERSION_TAG }}
+
       # Push latest tag
       - name: Push latest tag
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/autoscaleme:latest
+        run: |
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/autoscaleme:latest
+          docker push myimage:${{ env.VERSION_TAG }}
 
       # Success message
       - name: Success message
