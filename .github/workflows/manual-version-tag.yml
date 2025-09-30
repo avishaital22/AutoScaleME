@@ -1,0 +1,47 @@
+name: Manual Version Tag and Approve PR
+on:
+  workflow_dispatch:
+    inputs:
+      service_name:
+        description: 'Service to update'
+        required: true
+        type: string
+      release_type:
+        description: 'Release type (major/minor)'
+        required: true
+        type: choice
+        options:
+          - major
+          - minor
+      approver_name:
+        description: 'Approver name'
+        required: true
+        type: string
+
+jobs:
+  approve_and_tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Approve PR automatically
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const pr_number = process.env.PR_NUMBER;
+            await github.pulls.createReview({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: pr_number,
+              event: 'APPROVE',
+              body: `Approved by CI for ${process.env.approver_name}`
+            });
+        env:
+          PR_NUMBER: ${{ github.event.inputs.pr_number }}
+          approver_name: ${{ github.event.inputs.approver_name }}
+
+      - name: Set version tag and trigger push workflow
+        run: |
+          echo "SERVICE=${{ github.event.inputs.service_name }}" >> $GITHUB_ENV
+          echo "RELEASE=${{ github.event.inputs.release_type }}" >> $GITHUB_ENV
+          echo "TAG=1.0.0" >> $GITHUB_ENV  # You can expand logic for real versioning here
+
+      # Optionally trigger push after scan workflow with inputs or via repo dispatch API
