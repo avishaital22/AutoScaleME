@@ -1,17 +1,27 @@
-- name: Trigger push workflow via repository dispatch
-  uses: peter-evans/repository-dispatch@v2
-  with:
-    token: ${{ secrets.GITHUB_TOKEN }}
-    repository: ${{ github.repository }}
-    event-type: start-push
-    client-payload: |
-      {
-        "service_name": "${{ github.event.inputs.service_name }}",
-        "release_type": "${{ github.event.inputs.release_type }}",
-        "version_tag": "1.0.0",
-        "pr_number": "${{ github.event.inputs.pr_number }}",
-        "approver_name": "${{ github.event.inputs.approver_name }}"
-      }
+name: Manual Version Tag and Approve PR
+
+on:
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'Pull request number to approve'
+        required: true
+        type: string
+      service_name:
+        description: 'Service to update'
+        required: true
+        type: string
+      release_type:
+        description: 'Release type (major/minor)'
+        required: true
+        type: choice
+        options:
+          - major
+          - minor
+      approver_name:
+        description: 'Approver name'
+        required: true
+        type: string
 
 jobs:
   approve_and_tag:
@@ -37,6 +47,19 @@ jobs:
         run: |
           echo "SERVICE=${{ github.event.inputs.service_name }}" >> $GITHUB_ENV
           echo "RELEASE=${{ github.event.inputs.release_type }}" >> $GITHUB_ENV
-          echo "TAG=1.0.0" >> $GITHUB_ENV  # You can expand logic for real versioning here
+          echo "TAG=1.0.0" >> $GITHUB_ENV  # Adjust for actual tag logic
 
-      # Optionally trigger push after scan workflow with inputs or via repo dispatch API
+      - name: Trigger push workflow via repository dispatch
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          event-type: start-push
+          client-payload: |
+            {
+              "service_name": "${{ github.event.inputs.service_name }}",
+              "release_type": "${{ github.event.inputs.release_type }}",
+              "version_tag": "1.0.0",
+              "pr_number": "${{ github.event.inputs.pr_number }}",
+              "approver_name": "${{ github.event.inputs.approver_name }}"
+            }
