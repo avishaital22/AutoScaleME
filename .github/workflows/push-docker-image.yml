@@ -4,12 +4,10 @@ on:
   repository_dispatch:
     types: [start-push]
 
-
 jobs:
   push-latest:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' && env.VERSION_TAG != '' }}
-    # Set environment based on branch
+    # Keep your original environment block
     environment: ${{ 
       github.event.workflow_run.head_branch == 'main' && 'production' || 
       github.event.workflow_run.head_branch == 'release' && 'staging' || 
@@ -18,18 +16,20 @@ jobs:
       }}
       
     steps:
-      # Checkout is optional here since we only deal with images
+      - name: Set environment variables from payload
+        run: |
+          echo "VERSION_TAG=${{ github.event.client_payload.version_tag }}" >> $GITHUB_ENV
+          echo "SERVICE=${{ github.event.client_payload.service_name }}" >> $GITHUB_ENV
+
       - name: Log in to DockerHub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # Pull SHA-tagged Docker image from Docker Hub
       - name: Pull SHA-tagged Docker image
         run: docker pull ${{ secrets.DOCKERHUB_USERNAME }}/autoscaleme:${{ github.event.workflow_run.head_sha }}
 
-      # Tag the image as latest
       - name: Tag Docker image as latest
         run: |
           docker tag ${{ secrets.DOCKERHUB_USERNAME }}/autoscaleme:${{ github.event.workflow_run.head_sha }} \
@@ -37,13 +37,13 @@ jobs:
 
       - name: Tag Docker image with version
         run: |
-          docker tag ${{ secrets.DOCKERHUB_USERNAME }}/autoscaleme:${{ env.VERSION_TAG }}
+          docker tag ${{ secrets.DOCKERHUB_USERNAME }}/autoscaleme:${{ github.event.workflow_run.head_sha }} \
+                     ${{ secrets.DOCKERHUB_USERNAME }}/autoscaleme:${{ env.VERSION_TAG }}
 
-      # Push latest tag
       - name: Push latest tag
         run: |
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/autoscaleme:latest
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/autoscaleme:${{ env.VERSION_TAG }}
 
-      # Success message
       - name: Success message
         run: echo "Docker image pushed successfully"
