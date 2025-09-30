@@ -38,13 +38,12 @@ jobs:
 
       - name: Tag Docker image with version
         run: |
-          docker tag myimage:${{ github.sha }} myimage:${{ env.VERSION_TAG }}
+          docker tag ${{ secrets.DOCKERHUB_USERNAME }}/autoscaleme:${{ env.VERSION_TAG }}
 
       # Push latest tag
       - name: Push latest tag
         run: |
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/autoscaleme:latest
-          docker push myimage:${{ env.VERSION_TAG }}
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/autoscaleme:${{ env.VERSION_TAG }}
 
       # Success message
       - name: Success message
