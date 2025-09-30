@@ -1,22 +1,17 @@
-name: Manual Version Tag and Approve PR
-on:
-  workflow_dispatch:
-    inputs:
-      service_name:
-        description: 'Service to update'
-        required: true
-        type: string
-      release_type:
-        description: 'Release type (major/minor)'
-        required: true
-        type: choice
-        options:
-          - major
-          - minor
-      approver_name:
-        description: 'Approver name'
-        required: true
-        type: string
+- name: Trigger push workflow via repository dispatch
+  uses: peter-evans/repository-dispatch@v2
+  with:
+    token: ${{ secrets.GITHUB_TOKEN }}
+    repository: ${{ github.repository }}
+    event-type: start-push
+    client-payload: |
+      {
+        "service_name": "${{ github.event.inputs.service_name }}",
+        "release_type": "${{ github.event.inputs.release_type }}",
+        "version_tag": "1.0.0",
+        "pr_number": "${{ github.event.inputs.pr_number }}",
+        "approver_name": "${{ github.event.inputs.approver_name }}"
+      }
 
 jobs:
   approve_and_tag:
